@@ -1,21 +1,34 @@
 function generalizedNyquistPlotwithCrossing(sys, w)
-% Generalized Nyquist plot with:
+% generalizedNyquistPlotwithCrossing - Generalized Nyquist plot with LaTeX formatting
+%
+% Features:
 %  - True unit circle crossings
 %  - Phase margin annotations
 %  - Symmetric frequency sweep (to close loop)
 %  - Marker at point closest to critical point -1
+%
+% Syntax: generalizedNyquistPlotwithCrossing(sys, w)
+%
+% Inputs:
+%    sys - System transfer function
+%    w   - Angular frequency vector (optional)
 
-% Step 1: Frequency vector setup
-if nargin < 2
-    w_pos = logspace(-1, 3, 1000);  % Positive frequencies
-    w = [-fliplr(w_pos), w_pos];    % Full contour: negative + positive
-end
+    % Add path to utility functions
+    addpath(fileparts(mfilename('fullpath')));
+    addpath(fullfile(fileparts(mfilename('fullpath')), '..', '..'));
 
-% Step 2: Initialize plot
-figure;
-hold on; grid on; axis equal;
-title('Generalized Nyquist Plot with Stability Markers');
-xlabel('Re'); ylabel('Im');
+    % Step 1: Frequency vector setup
+    if nargin < 2
+        w_pos = logspace(-1, 3, 1000);  % Positive frequencies
+        w = [-fliplr(w_pos), w_pos];    % Full contour: negative + positive
+    end
+
+    % Step 2: Initialize plot
+    fig = figure('Color', 'white');
+    hold on; grid on; axis equal;
+    title('Generalized Nyquist Plot with Stability Markers', 'Interpreter', 'latex');
+    xlabel('$\mathrm{Re}$', 'Interpreter', 'latex');
+    ylabel('$\mathrm{Im}$', 'Interpreter', 'latex');
 
 % Unit circle
 theta = linspace(0, 2*pi, 500);
@@ -90,9 +103,16 @@ if ~isempty(closestPoint)
         closestPoint(4)/(2*pi), closestPoint(2), closestPoint(3));
 end
 
-% Colorbar for frequency
-colormap(cmap);
-colorbar('Ticks', linspace(0,1,5), ...
-    'TickLabels', arrayfun(@(f) sprintf('%.1f', f), ...
-    logspace(log10(abs(w(1))), log10(abs(w(end))), 5), 'UniformOutput', false));
+    % Colorbar for frequency
+    colormap(cmap);
+    cb = colorbar('Ticks', linspace(0,1,5), ...
+        'TickLabels', arrayfun(@(f) sprintf('%.1f', f), ...
+        logspace(log10(abs(w(1))), log10(abs(w(end))), 5), 'UniformOutput', false));
+    set(cb, 'TickLabelInterpreter', 'latex');
+
+    % Apply LaTeX formatting
+    setupLatexPlot(fig);
+
+    % Export figure
+    exportFigureHighQuality(fig, 'GeneralizedNyquistPlot');
 end
